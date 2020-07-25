@@ -36,14 +36,22 @@ import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.facebook.ads.AdSize;
-import com.facebook.ads.AdView;
-import com.facebook.ads.AudienceNetworkAds;
+
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 
 import static com.kloi.forex.Addclass.addShow;
 import static com.kloi.forex.Addclass.alertShowFun;
@@ -62,7 +70,9 @@ public class MainActivity extends AppCompatActivity {
 
     //select whether you want to upload multiple files (set 'true' for yes)
     private boolean multiple_files = false;
-    private AdView adView;
+    private InterstitialAd mInterstitialAd;
+    private boolean mCanShowAd;
+    private AdView mAdView;
 
     @SuppressLint({"SetJavaScriptEnabled", "WrongViewCast"})
     @SuppressWarnings({"findViewById", "RedundantCast"})
@@ -86,30 +96,28 @@ public class MainActivity extends AppCompatActivity {
 
         new Addclass(this);
 
-        AudienceNetworkAds.initialize(this);
-        adView = new AdView(this, getString(R.string.banner), AdSize.BANNER_HEIGHT_50);
-        // Find the Ad Container
-        LinearLayout adContainer = (LinearLayout) findViewById(R.id.banner_container1);
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
 
 
-        // Add the ad view to your activity layout
-        adContainer.addView(adView);
-
-
-        // Request an ad
-        adView.loadAd();
         webView = findViewById(R.id.webViewID);
-
+        mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 
         if (checkInternet()) {
             webLosad();
         } else alertShowFun();
         // webViewFunction(link);
 
+
     }
 
     public void webLosad() {
-        WebSettings webSettings = webView.getSettings();
+       addShow();
         assert webView != null;
         webView.getSettings().setAllowFileAccess(true);
 
@@ -201,6 +209,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
+
     public class Callback extends WebViewClient {
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
             Toast.makeText(getApplicationContext(), "Failed loading app!", Toast.LENGTH_SHORT).show();
@@ -285,8 +295,8 @@ public class MainActivity extends AppCompatActivity {
         webView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                webView.loadUrl(link);
                 addShow();
+                webView.loadUrl(link);
             }
         });
     }
@@ -295,6 +305,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
             super.onPageStarted(view, url, favicon);
+            addShow();
         }
 
         @Override
@@ -304,7 +315,7 @@ public class MainActivity extends AppCompatActivity {
 
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             view.loadUrl(url);
-            addShow();
+           addShow();
             return true;
         }
     }
@@ -314,6 +325,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onProgressChanged(WebView view, int newProgress) {
             super.onProgressChanged(view, newProgress);
+            addShow();
         }
     }
 

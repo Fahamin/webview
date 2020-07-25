@@ -8,15 +8,15 @@ import android.os.Build;
 
 import androidx.appcompat.app.AlertDialog;
 
-import com.facebook.ads.Ad;
-import com.facebook.ads.AdError;
-import com.facebook.ads.InterstitialAd;
-import com.facebook.ads.InterstitialAdListener;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+
 
 public class Addclass {
 
     static Context context;
-    private static InterstitialAd interstitial;
+    private static InterstitialAd mInterstitialAd;
 
     public Addclass(Context context) {
         this.context = context;
@@ -34,50 +34,23 @@ public class Addclass {
         }
     }
 
-    public static void addShow() {
+   public static void addShow() {
 
-        interstitial = new com.facebook.ads.InterstitialAd(context, context.getString(R.string.insta));
-        interstitial.setAdListener(new InterstitialAdListener() {
-            @Override
-            public void onInterstitialDisplayed(Ad ad) {
+            mInterstitialAd = new InterstitialAd(context);
+            mInterstitialAd.setAdUnitId(context.getString(R.string.interstital_add));
+            mInterstitialAd.loadAd(new AdRequest.Builder().build());
 
-            }
+            mInterstitialAd.setAdListener(new AdListener() {
+                public void onAdLoaded() {
+                    if (mInterstitialAd.isLoaded()) {
+                        mInterstitialAd.show();
+                    }
+                }
+            });
 
-            @Override
-            public void onInterstitialDismissed(Ad ad) {
-
-            }
-
-            @Override
-            public void onError(Ad ad, AdError adError) {
-
-            }
-
-            @Override
-            public void onAdLoaded(Ad ad) {
-                SHOWINSTADD();
-            }
-
-            @Override
-            public void onAdClicked(Ad ad) {
-
-            }
-
-            @Override
-            public void onLoggingImpression(Ad ad) {
-
-            }
-        });
-        interstitial.loadAd();
-        //}
 
     }
 
-    private static void SHOWINSTADD() {
-        if (interstitial.isAdLoaded()) {
-            interstitial.show();
-        }
-    }
 
     public static  void alertShowFun() {
         AlertDialog.Builder builder;
